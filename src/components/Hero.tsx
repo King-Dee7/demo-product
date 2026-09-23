@@ -312,7 +312,7 @@ export default function Hero() {
         </div>
 
         {/* Center: Can with subtle floating oscillation & navigation chevrons */}
-        <div className="relative flex-1 w-full max-h-[46vh] min-h-[170px] flex items-center justify-center my-auto">
+        <div className="relative flex-1 w-full max-h-[55vh] min-h-[300px] flex items-center justify-center my-auto">
           {/* Previous Flavor Button */}
           <button 
             onClick={handlePrevFlavor}
@@ -325,11 +325,11 @@ export default function Hero() {
           </button>
 
           {/* Can presentation */}
-          <div className="relative w-full h-full flex items-center justify-center pointer-events-auto">
+          <div className="relative w-full h-full flex items-center justify-center pointer-events-auto scale-110 sm:scale-125">
             <motion.div
               animate={hasEntered ? { y: [0, -3.5, 0] } : {}}
               transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut" }}
-              className="relative w-[210px] h-[210px] sm:w-[250px] sm:h-[250px] flex items-center justify-center"
+              className="relative w-[420px] h-[420px] sm:w-[500px] sm:h-[500px] flex items-center justify-center"
             >
               <AnimatePresence mode="wait">
                 <motion.div
