@@ -186,6 +186,7 @@ export default function Hero() {
   // Scroll wrappers for ScrollTrigger scrub
   const scrollCopyWrapperRef = useRef<HTMLDivElement>(null);
   const scrollSneakerWrapperRef = useRef<HTMLDivElement>(null);
+  const scrollRightWrapperRef = useRef<HTMLDivElement>(null);
   const scrollRunningFastWrapperRef = useRef<HTMLHeadingElement>(null);
 
   const copyRef = useRef<HTMLDivElement>(null);
@@ -499,9 +500,10 @@ export default function Hero() {
       5
     );
 
-    if (rightColumnRef.current) {
-      scrollTl.to(
-        rightColumnRef.current,
+    if (scrollRightWrapperRef.current) {
+      scrollTl.fromTo(
+        scrollRightWrapperRef.current,
+        { x: 0, y: 0, opacity: 1 },
         {
           x: 40,
           y: -15,
@@ -563,7 +565,7 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full text-white pt-24 sm:pt-28 lg:pt-30 pb-0 overflow-hidden min-h-screen"
+      className="relative w-full text-white pt-24 sm:pt-28 lg:pt-30 pb-0 overflow-x-clip min-h-screen"
     >
       {/* Dynamic Background Layers: 5 persistent layers for zero-flash crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -596,11 +598,11 @@ export default function Hero() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-28 sm:pb-32 lg:pb-36">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-10 sm:pt-12 lg:pt-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start pt-8 sm:pt-10 lg:pt-16">
           {/* Left Column: Headlines & CTA */}
           <div
             ref={scrollCopyWrapperRef}
-            className="lg:col-span-4 space-y-5 text-left -mt-8 sm:-mt-10 lg:-mt-12"
+            className="md:col-span-4 space-y-5 text-left -mt-6 sm:-mt-8 lg:-mt-12"
           >
             <div ref={copyRef} className={`space-y-5 ${!hasEntered ? "animate-entrance-copy" : ""}`}>
               <div className="space-y-1">
@@ -680,7 +682,7 @@ export default function Hero() {
           </div>
 
           {/* Center Column: Flying Sneaker */}
-          <div className="lg:col-span-5 relative flex items-center justify-center py-2 lg:py-6 z-40 lg:-mt-8">
+          <div className="md:col-span-5 relative flex items-center justify-center py-2 lg:py-6 z-30 lg:-mt-8">
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-white/10 filter blur-xl" />
             </div>
@@ -726,12 +728,16 @@ export default function Hero() {
 
           {/* Right Column: Preview Thumbnail & Slider Controls */}
           <div
-            ref={rightColumnRef}
-            className={`lg:col-span-3 flex lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-3 sm:gap-4 z-20 ${
-              !hasEntered ? "animate-entrance-right" : ""
-            }`}
+            ref={scrollRightWrapperRef}
+            className="md:col-span-3 flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 sm:gap-4 z-40 relative"
           >
-            {/* Slider Navigation Buttons (Top) */}
+            <div
+              ref={rightColumnRef}
+              className={`w-full flex flex-col items-center md:items-end gap-3 sm:gap-4 ${
+                !hasEntered ? "animate-entrance-right" : ""
+              }`}
+            >
+              {/* Slider Navigation Buttons (Top) */}
             <div className="flex items-center gap-3 pt-2 w-full lg:justify-end mb-1">
               <span className="text-sm font-semibold text-white mr-2 hidden sm:inline">
                 Our New Arrival
@@ -830,6 +836,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
+    </div>
 
       {/* Signature Element: Massive Cutout Typography */}
       <div
