@@ -376,11 +376,11 @@ export default function Hero() {
     goToShoe(nextIdx, "next");
   }, [displayIndex, isTransitioning, goToShoe]);
 
-  // Autoplay: continuously rotates shoe every 3 seconds (buffered on first load for cinematic sequence)
+  // Autoplay: continuously rotates shoe every 5 seconds (buffered on first load for cinematic sequence)
   useEffect(() => {
     if (isTransitioning || isCartOpen || isTabHidden) return;
 
-    const delay = isFirstMountRef.current ? 6500 : 3000;
+    const delay = isFirstMountRef.current ? 8000 : 5000;
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
     }
