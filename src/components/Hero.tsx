@@ -729,7 +729,7 @@ export default function Hero() {
           {/* Right Column: Preview Thumbnail & Slider Controls */}
           <div
             ref={scrollRightWrapperRef}
-            className="md:col-span-3 flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 sm:gap-4 z-40 relative"
+            className="md:col-span-3 flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 sm:gap-4 z-40 relative md:left-6 lg:left-8"
           >
             <div
               ref={rightColumnRef}
