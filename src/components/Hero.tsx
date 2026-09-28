@@ -737,29 +737,6 @@ export default function Hero() {
                 !hasEntered ? "animate-entrance-right" : ""
               }`}
             >
-              {/* Slider Navigation Buttons (Top) */}
-            <div className="flex items-center gap-3 pt-2 w-full lg:justify-end mb-1">
-              <span className="text-sm font-semibold text-white mr-2 hidden sm:inline">
-                Our New Arrival
-              </span>
-              <button
-                onClick={handlePrev}
-                disabled={isTransitioning}
-                className="w-8 h-8 rounded-full bg-transparent hover:bg-white/10 border border-white/40 text-white flex items-center justify-center transition disabled:opacity-50"
-                aria-label="Previous drop"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={isTransitioning}
-                className="w-8 h-8 rounded-full bg-transparent hover:bg-white/10 border border-white/40 text-white flex items-center justify-center transition shadow-lg disabled:opacity-50"
-                aria-label="Next drop"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
             {/* Top Right Preview Card (Dark variant - clickable to switch shoe) */}
             <div
               ref={previewCardRef}
