@@ -6,6 +6,7 @@ import TopTrends from "@/components/TopTrends";
 import TestimonialSection from "@/components/TestimonialSection";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import Preloader from "@/components/Preloader";
 import { CartProvider } from "@/context/CartContext";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 
@@ -13,6 +14,7 @@ export default function Home() {
   return (
     <CartProvider>
       <SmoothScrollProvider>
+        <Preloader />
         <main className="w-full min-h-screen bg-[#fbfcfd] text-neutral-900 overflow-x-hidden selection:bg-blue-600 selection:text-white">
           <Navbar />
           <Hero />
