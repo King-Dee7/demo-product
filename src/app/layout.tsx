@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zero Point | Energy Drink Showcase",
-  description: "Next-level cinematic product showcase",
+  title: "SNEAKHOUSE | Winter Collections 2026",
+  description: "SNEAKHOUSE - Winter Collections 2026. Running Fast with premium streetwear and athletic performance footwear.",
 };
 
 export default function RootLayout({
@@ -27,7 +27,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-black text-white">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#fbfcfd] text-neutral-900 overflow-x-hidden selection:bg-blue-600 selection:text-white">
+        {children}
+      </body>
     </html>
   );
 }
