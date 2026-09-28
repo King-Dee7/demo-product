@@ -44,8 +44,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Explore our new winter shoe collection, designed for warmth, comfort, and style on chilly days.",
     price: 195.0,
     image: "/images/chat1.png",
-    scale: 1.15,
-    y: 0,
+    scale: 1.62,
+    y: 10,
     theme: {
       bgGradient: "from-[#570e0e] via-[#991b1b] to-[#c2410c]",
       bgFrom: "#570e0e",
@@ -69,8 +69,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Iconic pine green leather overlays meet classic court comfort in this timeless staple.",
     price: 135.0,
     image: "/images/chat2.png",
-    scale: 1.15,
-    y: 0,
+    scale: 1.6,
+    y: 10,
     theme: {
       bgGradient: "from-[#063f27] via-[#0d6e43] to-[#15803d]",
       bgFrom: "#063f27",
@@ -94,8 +94,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Gradient aqua sunset veins paired with revolutionary dual-pressure Tuned Air cushioning.",
     price: 185.0,
     image: "/images/chat3.png",
-    scale: 1.18,
-    y: -4,
+    scale: 1.25,
+    y: 5,
     theme: {
       bgGradient: "from-[#042836] via-[#085a6f] to-[#0284c7]",
       bgFrom: "#042836",
@@ -119,8 +119,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Lightstrike Pro foam engineered with fiberglass Energyrods for snappy, race-day momentum.",
     price: 160.0,
     image: "/images/chat4.png",
-    scale: 1.28,
-    y: 4,
+    scale: 1.45,
+    y: 5,
     theme: {
       bgGradient: "from-[#450716] via-[#751128] to-[#9f1239]",
       bgFrom: "#450716",
@@ -144,8 +144,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Epic energy with 30% lighter Boost material, finished with vivid royal blue racing stripes.",
     price: 190.0,
     image: "/images/chat5.png",
-    scale: 1.28,
-    y: 4,
+    scale: 1.45,
+    y: 5,
     theme: {
       bgGradient: "from-[#0e33b5] via-[#1849e8] to-[#2563eb]",
       bgFrom: "#0e33b5",
@@ -679,10 +679,10 @@ export default function Hero() {
                       src={shoe.image}
                       alt={shoe.name}
                       width={800}
-                      height={600}
+                      height={585}
                       quality={90}
                       priority={idx === 0}
-                      className="w-full h-full object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)]"
+                      className="w-full h-auto object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)]"
                     />
                   </div>
                 ))}
