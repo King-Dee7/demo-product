@@ -26,6 +26,125 @@
   will-change: transform;
 }
 
+/* ========================================================
+   INITIAL LOAD CINEMATIC ENTRANCE ANIMATIONS (FRAME 0)
+   ======================================================== */
+@keyframes heroEntranceSneaker {
+  0% {
+    transform: translate3d(160px, 45px, 0) scale(1.1) rotate(-8deg);
+    opacity: 0;
+    filter: blur(8px);
+  }
+  65% {
+    transform: translate3d(-10px, 8px, 0) scale(1.64) rotate(1.5deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  100% {
+    transform: translate3d(0, 10px, 0) scale(1.62) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes heroEntranceCopy {
+  0% {
+    transform: translateY(32px);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes heroEntrancePill {
+  0% {
+    transform: translateY(24px) scale(0.92);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes heroEntranceRight {
+  0% {
+    transform: translateX(40px) scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes heroEntranceTitle {
+  0% {
+    transform: translateY(50px) scale(0.96);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes heroEntranceNav {
+  0% {
+    transform: translateY(-24px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-entrance-sneaker {
+  animation: heroEntranceSneaker 1.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-entrance-copy {
+  animation: heroEntranceCopy 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.animate-entrance-pill {
+  animation: heroEntrancePill 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+
+.animate-entrance-right {
+  animation: heroEntranceRight 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.animate-entrance-title {
+  animation: heroEntranceTitle 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.animate-entrance-nav {
+  animation: heroEntranceNav 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-entrance-sneaker,
+  .animate-entrance-copy,
+  .animate-entrance-pill,
+  .animate-entrance-right,
+  .animate-entrance-title,
+  .animate-entrance-nav,
+  .animate-hero-float {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
 
 body {
   color: var(--foreground);

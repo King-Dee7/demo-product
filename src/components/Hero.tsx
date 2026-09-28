@@ -172,6 +172,8 @@ export default function Hero() {
   const [copyIndex, setCopyIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isTabHidden, setIsTabHidden] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const isFirstMountRef = useRef(true);
 
   // References
   const sectionRef = useRef<HTMLElement>(null);
@@ -198,14 +200,19 @@ export default function Hero() {
   const nextShoeIndex = (displayIndex + 1) % HERO_SHOES.length;
   const nextShoe = HERO_SHOES[nextShoeIndex];
 
-  // Set theme properties on initial mount
+  // Set theme properties on initial mount and complete entrance after 1.45s
   useEffect(() => {
     const initialTheme = HERO_SHOES[0].theme;
     document.documentElement.style.setProperty("--hero-accent", initialTheme.accent);
     document.documentElement.style.setProperty("--hero-accent-light", initialTheme.accentLight);
     document.documentElement.style.setProperty("--hero-arrow-color", initialTheme.arrowHex);
 
+    const entranceTimer = setTimeout(() => {
+      setHasEntered(true);
+    }, 1450);
+
     return () => {
+      clearTimeout(entranceTimer);
       activeTimeline.current?.kill();
     };
   }, []);
@@ -219,6 +226,7 @@ export default function Hero() {
       const targetEl = shoeRefs.current[targetIndex];
       if (!currentEl || !targetEl) return;
 
+      setHasEntered(true);
       setIsTransitioning(true);
 
       const isNext = dir === "next";
@@ -368,13 +376,18 @@ export default function Hero() {
     goToShoe(nextIdx, "next");
   }, [displayIndex, isTransitioning, goToShoe]);
 
-  // Autoplay: continuously rotates shoe every 3 seconds
+  // Autoplay: continuously rotates shoe every 3 seconds (buffered slightly on first load)
   useEffect(() => {
     if (isTransitioning || isCartOpen || isTabHidden) return;
 
+    const delay = isFirstMountRef.current ? 4200 : 3000;
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+    }
+
     const timer = setTimeout(() => {
       handleNext();
-    }, 3000);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [displayIndex, isTransitioning, isCartOpen, isTabHidden, handleNext]);
@@ -570,7 +583,7 @@ export default function Hero() {
             ref={scrollCopyWrapperRef}
             className="lg:col-span-4 space-y-5 text-left -mt-8 sm:-mt-10 lg:-mt-12"
           >
-            <div ref={copyRef} className="space-y-5">
+            <div ref={copyRef} className={`space-y-5 ${!hasEntered ? "animate-entrance-copy" : ""}`}>
               <div className="space-y-1">
                 <h1 className="text-3xl sm:text-[2.75rem] lg:text-[3.25rem] font-bold tracking-tight leading-[1.05] text-white">
                   <span className="whitespace-nowrap">{copyShoe.tagline.split(" ")[0]} collections</span> <br />
@@ -599,7 +612,7 @@ export default function Hero() {
               </div>
 
               {/* Floating Mini Feature Pill */}
-              <div className="pt-0">
+              <div className={`pt-0 ${!hasEntered ? "animate-entrance-pill" : ""}`}>
                 <div className="inline-flex items-start gap-4 bg-white/10 backdrop-blur-md border border-white/10 px-4 py-3 rounded-2xl max-w-xs shadow-lg">
                   <div
                     className="w-16 h-14 rounded-xl p-1 flex items-center justify-center flex-shrink-0 shadow-md transition-all duration-500"
@@ -673,7 +686,9 @@ export default function Hero() {
                       pointerEvents: idx === 0 ? "auto" : "none",
                       zIndex: idx === 0 ? 10 : 0,
                     }}
-                    className="absolute inset-0 w-full h-full flex items-center justify-center transform-gpu will-change-transform"
+                    className={`absolute inset-0 w-full h-full flex items-center justify-center transform-gpu will-change-transform ${
+                      !hasEntered && idx === 0 ? "animate-entrance-sneaker" : ""
+                    }`}
                   >
                     <Image
                       src={shoe.image}
@@ -693,7 +708,9 @@ export default function Hero() {
           {/* Right Column: Preview Thumbnail & Slider Controls */}
           <div
             ref={rightColumnRef}
-            className="lg:col-span-3 flex lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-3 sm:gap-4 z-20"
+            className={`lg:col-span-3 flex lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-3 sm:gap-4 z-20 ${
+              !hasEntered ? "animate-entrance-right" : ""
+            }`}
           >
             {/* Slider Navigation Buttons (Top) */}
             <div className="flex items-center gap-3 pt-2 w-full lg:justify-end mb-1">
@@ -798,7 +815,9 @@ export default function Hero() {
       {/* Signature Element: Massive Cutout Typography */}
       <div
         ref={scrollRunningFastWrapperRef}
-        className="absolute bottom-6 left-0 right-0 w-full select-none pointer-events-none z-0 flex justify-center items-end"
+        className={`absolute bottom-6 left-0 right-0 w-full select-none pointer-events-none z-0 flex justify-center items-end ${
+          !hasEntered ? "animate-entrance-title" : ""
+        }`}
       >
         <h2
           ref={runningFastRef}

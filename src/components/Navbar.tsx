@@ -31,7 +31,7 @@ export default function Navbar() {
   return (
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-40 px-4 sm:px-8 pt-4 pb-2 transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-40 px-4 sm:px-8 pt-4 pb-2 transition-all duration-300 animate-entrance-nav"
     >
       <div
         className={`max-w-7xl mx-auto flex items-center justify-between transition-all duration-300 ${
