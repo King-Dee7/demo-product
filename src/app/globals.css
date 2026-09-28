@@ -28,15 +28,21 @@
 
 /* ========================================================
    INITIAL LOAD CINEMATIC ENTRANCE ANIMATIONS (FRAME 0)
+   Slow, velvety, luxury deceleration curve
    ======================================================== */
 @keyframes heroEntranceSneaker {
   0% {
-    transform: translate3d(160px, 45px, 0) scale(1.1) rotate(-8deg);
+    transform: translate3d(180px, 50px, 0) scale(1.05) rotate(-9deg);
     opacity: 0;
-    filter: blur(8px);
+    filter: blur(10px);
   }
-  65% {
-    transform: translate3d(-10px, 8px, 0) scale(1.64) rotate(1.5deg);
+  55% {
+    transform: translate3d(-14px, 7px, 0) scale(1.64) rotate(1.8deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  82% {
+    transform: translate3d(-2px, 9.5px, 0) scale(1.624) rotate(0.3deg);
     opacity: 1;
     filter: blur(0px);
   }
@@ -49,9 +55,9 @@
 
 @keyframes heroEntranceCopy {
   0% {
-    transform: translateY(32px);
+    transform: translateY(40px);
     opacity: 0;
-    filter: blur(6px);
+    filter: blur(8px);
   }
   100% {
     transform: translateY(0);
@@ -62,7 +68,7 @@
 
 @keyframes heroEntrancePill {
   0% {
-    transform: translateY(24px) scale(0.92);
+    transform: translateY(32px) scale(0.9);
     opacity: 0;
   }
   100% {
@@ -73,7 +79,7 @@
 
 @keyframes heroEntranceRight {
   0% {
-    transform: translateX(40px) scale(0.95);
+    transform: translateX(50px) scale(0.93);
     opacity: 0;
   }
   100% {
@@ -84,9 +90,9 @@
 
 @keyframes heroEntranceTitle {
   0% {
-    transform: translateY(50px) scale(0.96);
+    transform: translateY(60px) scale(0.95);
     opacity: 0;
-    filter: blur(6px);
+    filter: blur(8px);
   }
   100% {
     transform: translateY(0) scale(1);
@@ -97,7 +103,7 @@
 
 @keyframes heroEntranceNav {
   0% {
-    transform: translateY(-24px);
+    transform: translateY(-28px);
     opacity: 0;
   }
   100% {
@@ -107,27 +113,27 @@
 }
 
 .animate-entrance-sneaker {
-  animation: heroEntranceSneaker 1.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: heroEntranceSneaker 2.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animate-entrance-copy {
-  animation: heroEntranceCopy 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  animation: heroEntranceCopy 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
 }
 
 .animate-entrance-pill {
-  animation: heroEntrancePill 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+  animation: heroEntrancePill 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
 }
 
 .animate-entrance-right {
-  animation: heroEntranceRight 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  animation: heroEntranceRight 1.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
 }
 
 .animate-entrance-title {
-  animation: heroEntranceTitle 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+  animation: heroEntranceTitle 2.1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
 .animate-entrance-nav {
-  animation: heroEntranceNav 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+  animation: heroEntranceNav 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
 }
 
 @media (prefers-reduced-motion: reduce) {
