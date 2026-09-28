@@ -200,7 +200,7 @@ export default function Hero() {
   const nextShoeIndex = (displayIndex + 1) % HERO_SHOES.length;
   const nextShoe = HERO_SHOES[nextShoeIndex];
 
-  // Set theme properties on initial mount and complete entrance after 2.35s
+  // Set theme properties on initial mount and complete entrance after 3.5s
   useEffect(() => {
     const initialTheme = HERO_SHOES[0].theme;
     document.documentElement.style.setProperty("--hero-accent", initialTheme.accent);
@@ -209,7 +209,7 @@ export default function Hero() {
 
     const entranceTimer = setTimeout(() => {
       setHasEntered(true);
-    }, 2350);
+    }, 3500);
 
     return () => {
       clearTimeout(entranceTimer);
@@ -376,11 +376,11 @@ export default function Hero() {
     goToShoe(nextIdx, "next");
   }, [displayIndex, isTransitioning, goToShoe]);
 
-  // Autoplay: continuously rotates shoe every 3 seconds (buffered on first load for slow entrance)
+  // Autoplay: continuously rotates shoe every 3 seconds (buffered on first load for cinematic sequence)
   useEffect(() => {
     if (isTransitioning || isCartOpen || isTabHidden) return;
 
-    const delay = isFirstMountRef.current ? 5400 : 3000;
+    const delay = isFirstMountRef.current ? 6500 : 3000;
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
     }
