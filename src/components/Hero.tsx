@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, X, Check } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -165,58 +165,6 @@ const HERO_SHOES: HeroShoe[] = [
   },
 ];
 
-export interface FontVariant {
-  id: string;
-  name: string;
-  subtitle: string;
-  vibe: string;
-  headingClass: string;
-  stylePreview: string;
-}
-
-export const FONT_VARIANTS: FontVariant[] = [
-  {
-    id: "syne",
-    name: "1. Syne",
-    subtitle: "Dynamic Athletic Streetwear",
-    vibe: "Modern Nike / Off-White",
-    headingClass: "font-[family-name:var(--font-syne)] font-extrabold tracking-[-0.03em] leading-[0.98]",
-    stylePreview: "font-[family-name:var(--font-syne)] font-extrabold",
-  },
-  {
-    id: "bebas",
-    name: "2. Bebas Neue",
-    subtitle: "High-Velocity Track & Racing",
-    vibe: "Muscular Condensed Display",
-    headingClass: "font-[family-name:var(--font-bebas-neue)] uppercase tracking-[0.025em] leading-[0.92] text-4xl sm:text-[3.5rem] lg:text-[4.15rem]",
-    stylePreview: "font-[family-name:var(--font-bebas-neue)] tracking-wider uppercase",
-  },
-  {
-    id: "space",
-    name: "3. Space Grotesk",
-    subtitle: "Retro 80s/90s Court & Skate",
-    vibe: "Dunk Heritage & Street",
-    headingClass: "font-[family-name:var(--font-space-grotesk)] font-bold tracking-[-0.04em] leading-[1.02]",
-    stylePreview: "font-[family-name:var(--font-space-grotesk)] font-bold",
-  },
-  {
-    id: "unbounded",
-    name: "4. Unbounded",
-    subtitle: "Luxury Sneaker Drop",
-    vibe: "Ultra-Wide High Fashion",
-    headingClass: "font-[family-name:var(--font-unbounded)] font-black tracking-[-0.02em] leading-[1.08] text-[1.65rem] sm:text-[2.25rem] lg:text-[2.65rem]",
-    stylePreview: "font-[family-name:var(--font-unbounded)] font-black",
-  },
-  {
-    id: "geist",
-    name: "Baseline (Geist)",
-    subtitle: "Original Modern Tech Sans",
-    vibe: "Clean & Balanced",
-    headingClass: "font-[family-name:var(--font-geist-sans)] font-bold tracking-tight leading-[1.05]",
-    stylePreview: "font-[family-name:var(--font-geist-sans)] font-bold",
-  },
-];
-
 export default function Hero() {
   const { addToCart, isOpen: isCartOpen } = useCart();
 
@@ -225,8 +173,6 @@ export default function Hero() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isTabHidden, setIsTabHidden] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
-  const [activeFontIndex, setActiveFontIndex] = useState(0);
-  const [isSwitcherOpen, setIsSwitcherOpen] = useState(true);
   const isFirstMountRef = useRef(true);
 
   // References
@@ -254,7 +200,6 @@ export default function Hero() {
   const copyShoe = HERO_SHOES[copyIndex];
   const nextShoeIndex = (displayIndex + 1) % HERO_SHOES.length;
   const nextShoe = HERO_SHOES[nextShoeIndex];
-  const activeFont = FONT_VARIANTS[activeFontIndex] || FONT_VARIANTS[0];
 
   // Set theme properties on initial mount and complete entrance after 3.5s
   useEffect(() => {
@@ -661,9 +606,7 @@ export default function Hero() {
           >
             <div ref={copyRef} className={`space-y-5 ${!hasEntered ? "animate-entrance-copy" : ""}`}>
               <div className="space-y-1">
-                <h1
-                  className={`text-3xl sm:text-[2.75rem] lg:text-[3.25rem] text-white transition-all duration-300 ${activeFont.headingClass}`}
-                >
+                <h1 className="text-3xl sm:text-[3.35rem] lg:text-[3.9rem] font-bold font-[family-name:var(--font-space-grotesk)] tracking-[-0.035em] leading-[0.98] text-white">
                   <span className="whitespace-nowrap">{copyShoe.tagline.split(" ")[0]} collections</span> <br />
                   <span className="text-white/95 font-bold">2026</span>
                 </h1>
@@ -886,109 +829,6 @@ export default function Hero() {
           RUNNING FAST
         </h2>
       </div>
-
-      {/* Floating Design Experimenter UI Switcher (per /design-experimenter skill) */}
-      <aside aria-label="Font design experimenter" className="fixed bottom-5 right-5 z-[100] select-none font-sans">
-        {isSwitcherOpen ? (
-          <div className="bg-neutral-950/92 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl p-4 w-[310px] sm:w-[340px] text-white animate-in fade-in slide-in-from-bottom-4 duration-300">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-              <div className="flex items-center gap-2.5">
-                <span
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shadow-inner"
-                  style={{ backgroundColor: currentShoe.theme.buttonHex }}
-                >
-                  <Sparkles className="w-4 h-4 text-white" />
-                </span>
-                <div>
-                  <h4 className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-                    Font Experimenter
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/15 text-white/90 font-medium">
-                      Live
-                    </span>
-                  </h4>
-                  <p className="text-[10px] text-white/60">Heading Typography Styles</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsSwitcherOpen(false)}
-                className="w-6 h-6 rounded-md hover:bg-white/10 text-white/60 hover:text-white flex items-center justify-center transition cursor-pointer"
-                title="Minimize panel"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Font Options */}
-            <div className="space-y-1.5">
-              {FONT_VARIANTS.map((font, idx) => {
-                const isActive = activeFontIndex === idx;
-                return (
-                  <button
-                    key={font.id}
-                    onClick={() => setActiveFontIndex(idx)}
-                    className={`w-full text-left px-3 py-2 rounded-xl transition-all flex items-center justify-between group border cursor-pointer ${
-                      isActive
-                        ? "bg-white/15 border-white/40 shadow-md ring-1 ring-white/20"
-                        : "bg-white/5 hover:bg-white/10 border-transparent text-white/80 hover:text-white"
-                    }`}
-                  >
-                    <div className="min-w-0 pr-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-sm tracking-tight text-white leading-tight ${font.stylePreview}`}>
-                          {font.name}
-                        </span>
-                        {isActive && (
-                          <span
-                            className="w-1.5 h-1.5 rounded-full animate-pulse"
-                            style={{ backgroundColor: currentShoe.theme.accent }}
-                          />
-                        )}
-                      </div>
-                      <p className="text-[10px] text-white/50 truncate pt-0.5">{font.vibe}</p>
-                    </div>
-
-                    <div className="flex-shrink-0">
-                      {isActive ? (
-                        <div
-                          className="w-5 h-5 rounded-full flex items-center justify-center text-white shadow-sm"
-                          style={{ backgroundColor: currentShoe.theme.buttonHex }}
-                        >
-                          <Check className="w-3 h-3 stroke-[2.5]" />
-                        </div>
-                      ) : (
-                        <span className="text-[10px] text-white/40 group-hover:text-white/70 transition-colors">
-                          Try
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Footer */}
-            <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-[10px] text-white/50">
-              <span>Click to preview live</span>
-              <span className="text-white/75 font-semibold">4 Directions</span>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setIsSwitcherOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-neutral-950/90 text-white border border-white/20 shadow-2xl backdrop-blur-xl hover:scale-105 active:scale-95 transition-all text-xs font-semibold group cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-orange-400 group-hover:rotate-12 transition-transform" />
-            <span>Font Experimenter</span>
-            <span
-              className="px-2 py-0.5 rounded-full text-[10px] text-white font-medium"
-              style={{ backgroundColor: currentShoe.theme.buttonHex }}
-            >
-              {FONT_VARIANTS[activeFontIndex].name.split(". ")[1] || FONT_VARIANTS[activeFontIndex].name}
-            </span>
-          </button>
-        )}
-      </aside>
     </section>
   );
 }
