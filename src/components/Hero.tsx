@@ -172,7 +172,6 @@ export default function Hero() {
   const [outgoingIndex, setOutgoingIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const [isTabHidden, setIsTabHidden] = useState(false);
 
   // References
@@ -200,17 +199,21 @@ export default function Hero() {
   const nextShoeIndex = (currentIndex + 1) % HERO_SHOES.length;
   const nextShoe = HERO_SHOES[nextShoeIndex];
 
-  // Preload sneaker images on mount for immediate transitions
+  // Set theme properties and warm up remaining sneaker images without blocking initial paint
   useEffect(() => {
-    HERO_SHOES.forEach((shoe) => {
-      const img = new window.Image();
-      img.src = shoe.image;
-    });
-
     const initialTheme = HERO_SHOES[0].theme;
     document.documentElement.style.setProperty("--hero-accent", initialTheme.accent);
     document.documentElement.style.setProperty("--hero-accent-light", initialTheme.accentLight);
     document.documentElement.style.setProperty("--hero-arrow-color", initialTheme.arrowHex);
+
+    const timer = setTimeout(() => {
+      HERO_SHOES.slice(1).forEach((shoe) => {
+        const img = new window.Image();
+        img.src = shoe.image;
+      });
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Smooth directional shoe transition
@@ -268,6 +271,14 @@ export default function Hero() {
         if (bgMorphRef.current) {
           gsap.set(bgMorphRef.current, { opacity: 0 });
         }
+        if (currentShoeRef.current) {
+          gsap.set(currentShoeRef.current, {
+            clearProps: "x,rotation",
+            y: targetShoe.y,
+            scale: targetShoe.scale,
+            opacity: 1,
+          });
+        }
       },
     });
 
@@ -289,7 +300,7 @@ export default function Hero() {
         outgoingShoeRef.current,
         {
           x: outX,
-          y: 40,
+          y: prevShoe.y + 35,
           scale: prevShoe.scale * 0.85,
           rotation: outRot,
           opacity: 0,
@@ -304,7 +315,7 @@ export default function Hero() {
     if (currentShoeRef.current) {
       gsap.set(currentShoeRef.current, {
         x: inStartX,
-        y: -25,
+        y: targetShoe.y - 25,
         scale: targetShoe.scale * 0.85,
         rotation: inRot,
         opacity: 0,
@@ -314,7 +325,7 @@ export default function Hero() {
         currentShoeRef.current,
         {
           x: 0,
-          y: 0,
+          y: targetShoe.y,
           scale: targetShoe.scale,
           rotation: 0,
           opacity: 1,
@@ -350,16 +361,16 @@ export default function Hero() {
     };
   }, [outgoingIndex, currentIndex, direction]);
 
-  // Autoplay: automatically changes shoe every 3 seconds
+  // Autoplay: continuously rotates shoe every 3 seconds
   useEffect(() => {
-    if (isTransitioning || isHovered || isCartOpen || isTabHidden) return;
+    if (isTransitioning || isCartOpen || isTabHidden) return;
 
     const timer = setTimeout(() => {
       handleNext();
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [currentIndex, isTransitioning, isHovered, isCartOpen, isTabHidden, handleNext]);
+  }, [currentIndex, isTransitioning, isCartOpen, isTabHidden, handleNext]);
 
   // Tab visibility listener
   useEffect(() => {
@@ -577,11 +588,7 @@ export default function Hero() {
               </div>
 
               {/* Floating Mini Feature Pill */}
-              <div
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                className="pt-0"
-              >
+              <div className="pt-0">
                 <div className="inline-flex items-start gap-4 bg-white/10 backdrop-blur-md border border-white/10 px-4 py-3 rounded-2xl max-w-xs shadow-lg">
                   <div
                     className="w-16 h-14 rounded-xl p-1 flex items-center justify-center flex-shrink-0 shadow-md transition-all duration-500"
@@ -592,7 +599,7 @@ export default function Hero() {
                       alt={currentShoe.name}
                       width={48}
                       height={36}
-                      quality={99}
+                      quality={90}
                       priority
                       className="object-contain"
                     />
@@ -637,14 +644,17 @@ export default function Hero() {
 
             <div
               ref={scrollSneakerWrapperRef}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
+              onClick={handleNext}
               className="relative w-full max-w-[560px] sm:max-w-[680px] lg:max-w-[820px] aspect-[4/3] flex items-center justify-center select-none transform-gpu will-change-transform cursor-pointer"
+              title="Click sneaker to view next drop"
             >
               {/* Outgoing sneaker during transition */}
               {outgoingIndex !== null && (
                 <div
                   ref={outgoingShoeRef}
+                  style={{
+                    transform: `translate3d(0, ${HERO_SHOES[outgoingIndex].y}px, 0) scale(${HERO_SHOES[outgoingIndex].scale})`,
+                  }}
                   className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none transform-gpu will-change-transform z-10"
                 >
                   <Image
@@ -652,7 +662,7 @@ export default function Hero() {
                     alt={HERO_SHOES[outgoingIndex].name}
                     width={800}
                     height={585}
-                    quality={99}
+                    quality={90}
                     priority
                     className="w-full h-auto object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)]"
                   />
@@ -662,17 +672,28 @@ export default function Hero() {
               {/* Current active sneaker */}
               <div
                 ref={currentShoeRef}
+                style={{
+                  transform: `translate3d(0, ${currentShoe.y}px, 0) scale(${currentShoe.scale})`,
+                }}
                 className="absolute inset-0 w-full h-full flex items-center justify-center transform-gpu will-change-transform z-20"
               >
-                <Image
-                  src={currentShoe.image}
-                  alt={currentShoe.name}
-                  width={800}
-                  height={585}
-                  quality={99}
-                  priority
-                  className="w-full h-auto object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)]"
-                />
+                <div
+                  className={
+                    isTransitioning
+                      ? "w-full h-full flex items-center justify-center"
+                      : "w-full h-full flex items-center justify-center animate-hero-float"
+                  }
+                >
+                  <Image
+                    src={currentShoe.image}
+                    alt={currentShoe.name}
+                    width={800}
+                    height={585}
+                    quality={90}
+                    priority
+                    className="w-full h-auto object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)]"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -680,8 +701,6 @@ export default function Hero() {
           {/* Right Column: Preview Thumbnail & Slider Controls */}
           <div
             ref={rightColumnRef}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
             className="lg:col-span-3 flex lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-3 sm:gap-4 z-20"
           >
             {/* Slider Navigation Buttons (Top) */}
@@ -728,7 +747,7 @@ export default function Hero() {
                   alt={nextShoe.name}
                   width={140}
                   height={90}
-                  quality={99}
+                  quality={90}
                   className="object-contain group-hover/card:scale-105 transition-transform duration-300"
                 />
               </div>

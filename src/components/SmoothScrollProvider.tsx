@@ -32,9 +32,6 @@ export default function SmoothScrollProvider({
       lenis.raf(time * 1000);
     });
 
-    // Prevent GSAP from adding its own requestAnimationFrame on top
-    gsap.ticker.lagSmoothing(0);
-
     return () => {
       gsap.ticker.remove(ticker);
       lenis.destroy();

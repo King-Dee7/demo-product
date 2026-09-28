@@ -21,28 +21,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (!headerRef.current) return;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (prefersReducedMotion) {
-      gsap.set(headerRef.current, { opacity: 1, y: 0 });
-      return;
-    }
-
-    gsap.fromTo(
-      headerRef.current,
-      { y: -24, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.45,
-        ease: "power2.out",
-        delay: 0.05,
-      }
-    );
-  }, []);
-
   const navLinks = [
     { name: "Our Collections", href: "#collections" },
     { name: "Shop", href: "#collections" },
@@ -53,7 +31,7 @@ export default function Navbar() {
   return (
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-40 px-4 sm:px-8 pt-4 pb-2 transition-all duration-300 opacity-0"
+      className="fixed top-0 left-0 right-0 z-40 px-4 sm:px-8 pt-4 pb-2 transition-all duration-300"
     >
       <div
         className={`max-w-7xl mx-auto flex items-center justify-between transition-all duration-300 ${
