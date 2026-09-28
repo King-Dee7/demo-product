@@ -44,8 +44,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Explore our new winter shoe collection, designed for warmth, comfort, and style on chilly days.",
     price: 195.0,
     image: "/images/chat1.png",
-    scale: 1.62,
-    y: 15,
+    scale: 1.15,
+    y: 0,
     theme: {
       bgGradient: "from-[#570e0e] via-[#991b1b] to-[#c2410c]",
       bgFrom: "#570e0e",
@@ -69,8 +69,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Iconic pine green leather overlays meet classic court comfort in this timeless staple.",
     price: 135.0,
     image: "/images/chat2.png",
-    scale: 1.6,
-    y: 15,
+    scale: 1.15,
+    y: 0,
     theme: {
       bgGradient: "from-[#063f27] via-[#0d6e43] to-[#15803d]",
       bgFrom: "#063f27",
@@ -94,8 +94,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Gradient aqua sunset veins paired with revolutionary dual-pressure Tuned Air cushioning.",
     price: 185.0,
     image: "/images/chat3.png",
-    scale: 1.25,
-    y: 5,
+    scale: 1.18,
+    y: -4,
     theme: {
       bgGradient: "from-[#042836] via-[#085a6f] to-[#0284c7]",
       bgFrom: "#042836",
@@ -119,8 +119,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Lightstrike Pro foam engineered with fiberglass Energyrods for snappy, race-day momentum.",
     price: 160.0,
     image: "/images/chat4.png",
-    scale: 1.45,
-    y: 5,
+    scale: 1.28,
+    y: 4,
     theme: {
       bgGradient: "from-[#450716] via-[#751128] to-[#9f1239]",
       bgFrom: "#450716",
@@ -144,8 +144,8 @@ const HERO_SHOES: HeroShoe[] = [
     desc: "Epic energy with 30% lighter Boost material, finished with vivid royal blue racing stripes.",
     price: 190.0,
     image: "/images/chat5.png",
-    scale: 1.45,
-    y: 5,
+    scale: 1.28,
+    y: 4,
     theme: {
       bgGradient: "from-[#0e33b5] via-[#1849e8] to-[#2563eb]",
       bgFrom: "#0e33b5",
@@ -168,161 +168,143 @@ const HERO_SHOES: HeroShoe[] = [
 export default function Hero() {
   const { addToCart, isOpen: isCartOpen } = useCart();
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [outgoingIndex, setOutgoingIndex] = useState<number | null>(null);
-  const [direction, setDirection] = useState<"next" | "prev">("next");
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [copyIndex, setCopyIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isTabHidden, setIsTabHidden] = useState(false);
 
   // References
   const sectionRef = useRef<HTMLElement>(null);
-  const bgBaseRef = useRef<HTMLDivElement>(null);
-  const bgMorphRef = useRef<HTMLDivElement>(null);
-  const bgScrollOverlayRef = useRef<HTMLDivElement>(null);
+  const bgRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const shoeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const glow1Ref = useRef<HTMLDivElement>(null);
   const glow2Ref = useRef<HTMLDivElement>(null);
+  const bgScrollOverlayRef = useRef<HTMLDivElement>(null);
 
   // Scroll wrappers for ScrollTrigger scrub
   const scrollCopyWrapperRef = useRef<HTMLDivElement>(null);
   const scrollSneakerWrapperRef = useRef<HTMLDivElement>(null);
-  const scrollRunningFastWrapperRef = useRef<HTMLDivElement>(null);
+  const scrollRunningFastWrapperRef = useRef<HTMLHeadingElement>(null);
 
   const copyRef = useRef<HTMLDivElement>(null);
   const previewCardRef = useRef<HTMLDivElement>(null);
-  const outgoingShoeRef = useRef<HTMLDivElement>(null);
-  const currentShoeRef = useRef<HTMLDivElement>(null);
-
   const rightColumnRef = useRef<HTMLDivElement>(null);
   const runningFastRef = useRef<HTMLHeadingElement>(null);
 
-  const currentShoe = HERO_SHOES[currentIndex];
-  const nextShoeIndex = (currentIndex + 1) % HERO_SHOES.length;
+  const activeTimeline = useRef<gsap.core.Timeline | null>(null);
+
+  const currentShoe = HERO_SHOES[displayIndex];
+  const copyShoe = HERO_SHOES[copyIndex];
+  const nextShoeIndex = (displayIndex + 1) % HERO_SHOES.length;
   const nextShoe = HERO_SHOES[nextShoeIndex];
 
-  // Set theme properties and warm up remaining sneaker images without blocking initial paint
+  // Set theme properties on initial mount
   useEffect(() => {
     const initialTheme = HERO_SHOES[0].theme;
     document.documentElement.style.setProperty("--hero-accent", initialTheme.accent);
     document.documentElement.style.setProperty("--hero-accent-light", initialTheme.accentLight);
     document.documentElement.style.setProperty("--hero-arrow-color", initialTheme.arrowHex);
 
-    const timer = setTimeout(() => {
-      HERO_SHOES.slice(1).forEach((shoe) => {
-        const img = new window.Image();
-        img.src = shoe.image;
-      });
-    }, 1500);
-
-    return () => clearTimeout(timer);
+    return () => {
+      activeTimeline.current?.kill();
+    };
   }, []);
 
   // Smooth directional shoe transition
   const goToShoe = useCallback(
     (targetIndex: number, dir: "next" | "prev") => {
-      if (isTransitioning || targetIndex === currentIndex) return;
+      if (isTransitioning || targetIndex === displayIndex) return;
 
-      const targetShoe = HERO_SHOES[targetIndex];
+      const currentEl = shoeRefs.current[displayIndex];
+      const targetEl = shoeRefs.current[targetIndex];
+      if (!currentEl || !targetEl) return;
 
       setIsTransitioning(true);
-      setOutgoingIndex(currentIndex);
-      setCurrentIndex(targetIndex);
-      setDirection(dir);
 
-      document.documentElement.style.setProperty("--hero-accent", targetShoe.theme.accent);
-      document.documentElement.style.setProperty("--hero-accent-light", targetShoe.theme.accentLight);
-      document.documentElement.style.setProperty("--hero-arrow-color", targetShoe.theme.arrowHex);
-    },
-    [isTransitioning, currentIndex]
-  );
+      const isNext = dir === "next";
+      const targetShoe = HERO_SHOES[targetIndex];
+      const prevShoe = HERO_SHOES[displayIndex];
 
-  const handlePrev = useCallback(() => {
-    if (isTransitioning) return;
-    const prevIdx = currentIndex === 0 ? HERO_SHOES.length - 1 : currentIndex - 1;
-    goToShoe(prevIdx, "prev");
-  }, [currentIndex, isTransitioning, goToShoe]);
+      const outX = isNext ? -140 : 140;
+      const inStartX = isNext ? 140 : -140;
+      const outRot = isNext ? 5 : -5;
+      const inStartRot = isNext ? -5 : 5;
 
-  const handleNext = useCallback(() => {
-    if (isTransitioning) return;
-    const nextIdx = (currentIndex + 1) % HERO_SHOES.length;
-    goToShoe(nextIdx, "next");
-  }, [currentIndex, isTransitioning, goToShoe]);
+      gsap.killTweensOf(currentEl);
+      gsap.killTweensOf(targetEl);
 
-  // Execute GSAP transition whenever outgoingIndex is set
-  useEffect(() => {
-    if (outgoingIndex === null) return;
+      // Prepare target shoe
+      gsap.set(targetEl, {
+        x: inStartX,
+        y: targetShoe.y - 10,
+        scale: targetShoe.scale * 0.88,
+        rotation: inStartRot,
+        opacity: 0,
+        zIndex: 20,
+        pointerEvents: "none",
+      });
+      gsap.set(currentEl, {
+        zIndex: 10,
+        pointerEvents: "none",
+      });
 
-    const targetShoe = HERO_SHOES[currentIndex];
-    const prevShoe = HERO_SHOES[outgoingIndex];
-    const isNext = direction === "next";
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setDisplayIndex(targetIndex);
+          setIsTransitioning(false);
 
-    const outX = isNext ? -170 : 170;
-    const inStartX = isNext ? 170 : -170;
-    const outRot = isNext ? 8 : -8;
-    const inRot = isNext ? -8 : 8;
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setOutgoingIndex(null);
-        setIsTransitioning(false);
-
-        if (bgBaseRef.current) {
-          bgBaseRef.current.className = `absolute inset-0 bg-gradient-to-br ${targetShoe.theme.bgGradient}`;
-        }
-        if (bgMorphRef.current) {
-          gsap.set(bgMorphRef.current, { opacity: 0 });
-        }
-        if (currentShoeRef.current) {
-          gsap.set(currentShoeRef.current, {
-            clearProps: "x,rotation",
+          gsap.set(targetEl, {
+            x: 0,
             y: targetShoe.y,
             scale: targetShoe.scale,
+            rotation: 0,
             opacity: 1,
+            zIndex: 10,
+            pointerEvents: "auto",
           });
-        }
-      },
-    });
+          gsap.set(currentEl, {
+            opacity: 0,
+            zIndex: 0,
+            pointerEvents: "none",
+          });
+        },
+      });
+      activeTimeline.current = tl;
 
-    // 1. Background gradient morph
-    if (bgMorphRef.current) {
-      bgMorphRef.current.className = `absolute inset-0 pointer-events-none bg-gradient-to-br ${targetShoe.theme.bgGradient}`;
-      tl.fromTo(bgMorphRef.current, { opacity: 0 }, { opacity: 1, duration: 0.65, ease: "power2.inOut" }, 0);
-    }
+      // 1. Background gradients crossfade
+      const currentBg = bgRefs.current[displayIndex];
+      const targetBg = bgRefs.current[targetIndex];
+      if (targetBg) {
+        tl.to(targetBg, { opacity: 1, duration: 0.65, ease: "power2.inOut" }, 0);
+      }
+      if (currentBg) {
+        tl.to(currentBg, { opacity: 0, duration: 0.65, ease: "power2.inOut" }, 0);
+      }
 
-    // 2. Glow colors
-    if (glow1Ref.current && glow2Ref.current) {
-      tl.to(glow1Ref.current, { backgroundColor: targetShoe.theme.glow1Color, duration: 0.65, ease: "power2.out" }, 0);
-      tl.to(glow2Ref.current, { backgroundColor: targetShoe.theme.glow2Color, duration: 0.65, ease: "power2.out" }, 0);
-    }
+      // 2. Glow colors
+      if (glow1Ref.current && glow2Ref.current) {
+        tl.to(glow1Ref.current, { backgroundColor: targetShoe.theme.glow1Color, duration: 0.65, ease: "power2.out" }, 0);
+        tl.to(glow2Ref.current, { backgroundColor: targetShoe.theme.glow2Color, duration: 0.65, ease: "power2.out" }, 0);
+      }
 
-    // 3. Outgoing Sneaker
-    if (outgoingShoeRef.current) {
+      // 3. Outgoing Sneaker glides out
       tl.to(
-        outgoingShoeRef.current,
+        currentEl,
         {
           x: outX,
-          y: prevShoe.y + 35,
-          scale: prevShoe.scale * 0.85,
+          y: prevShoe.y + 15,
+          scale: prevShoe.scale * 0.88,
           rotation: outRot,
           opacity: 0,
-          duration: 0.55,
+          duration: 0.6,
           ease: "power2.inOut",
         },
         0
       );
-    }
 
-    // 4. Incoming Sneaker
-    if (currentShoeRef.current) {
-      gsap.set(currentShoeRef.current, {
-        x: inStartX,
-        y: targetShoe.y - 25,
-        scale: targetShoe.scale * 0.85,
-        rotation: inRot,
-        opacity: 0,
-      });
-
+      // 4. Incoming Sneaker sweeps in
       tl.to(
-        currentShoeRef.current,
+        targetEl,
         {
           x: 0,
           y: targetShoe.y,
@@ -332,34 +314,59 @@ export default function Hero() {
           duration: 0.65,
           ease: "power2.out",
         },
-        0.05
+        0.03
       );
-    }
 
-    // 5. Left Copy Crossfade
-    if (copyRef.current) {
-      tl.fromTo(
-        copyRef.current,
-        { opacity: 0.35, y: isNext ? 10 : -10 },
-        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-        0.08
-      );
-    }
+      // 5. Left Copy Soft Crossfade: fades out, updates text, fades in
+      if (copyRef.current) {
+        tl.to(
+          copyRef.current,
+          { opacity: 0.15, y: isNext ? -6 : 6, duration: 0.22, ease: "power2.in" },
+          0
+        );
+        tl.call(
+          () => {
+            setCopyIndex(targetIndex);
+          },
+          [],
+          0.23
+        );
+        tl.to(
+          copyRef.current,
+          { opacity: 1, y: 0, duration: 0.38, ease: "power2.out" },
+          0.24
+        );
+      }
 
-    // 6. Preview Card Soft Update
-    if (previewCardRef.current) {
-      tl.fromTo(
-        previewCardRef.current,
-        { scale: 0.96, opacity: 0.7 },
-        { scale: 1, opacity: 1, duration: 0.45, ease: "power2.out" },
-        0.1
-      );
-    }
+      // 6. Preview Card Soft Update
+      if (previewCardRef.current) {
+        tl.fromTo(
+          previewCardRef.current,
+          { scale: 0.96, opacity: 0.7 },
+          { scale: 1, opacity: 1, duration: 0.45, ease: "power2.out" },
+          0.1
+        );
+      }
 
-    return () => {
-      tl.kill();
-    };
-  }, [outgoingIndex, currentIndex, direction]);
+      // 7. Update Accent CSS variables
+      document.documentElement.style.setProperty("--hero-accent", targetShoe.theme.accent);
+      document.documentElement.style.setProperty("--hero-accent-light", targetShoe.theme.accentLight);
+      document.documentElement.style.setProperty("--hero-arrow-color", targetShoe.theme.arrowHex);
+    },
+    [displayIndex, isTransitioning]
+  );
+
+  const handlePrev = useCallback(() => {
+    if (isTransitioning) return;
+    const prevIdx = displayIndex === 0 ? HERO_SHOES.length - 1 : displayIndex - 1;
+    goToShoe(prevIdx, "prev");
+  }, [displayIndex, isTransitioning, goToShoe]);
+
+  const handleNext = useCallback(() => {
+    if (isTransitioning) return;
+    const nextIdx = (displayIndex + 1) % HERO_SHOES.length;
+    goToShoe(nextIdx, "next");
+  }, [displayIndex, isTransitioning, goToShoe]);
 
   // Autoplay: continuously rotates shoe every 3 seconds
   useEffect(() => {
@@ -370,7 +377,7 @@ export default function Hero() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [currentIndex, isTransitioning, isCartOpen, isTabHidden, handleNext]);
+  }, [displayIndex, isTransitioning, isCartOpen, isTabHidden, handleNext]);
 
   // Tab visibility listener
   useEffect(() => {
@@ -526,14 +533,18 @@ export default function Hero() {
       ref={sectionRef}
       className="relative w-full text-white pt-24 sm:pt-28 lg:pt-30 pb-0 overflow-hidden min-h-screen"
     >
-      {/* Dynamic Background Layers */}
+      {/* Dynamic Background Layers: 5 persistent layers for zero-flash crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div
-          ref={bgBaseRef}
-          className={`absolute inset-0 bg-gradient-to-br ${currentShoe.theme.bgGradient}`}
-        />
-
-        <div ref={bgMorphRef} className="absolute inset-0 opacity-0 pointer-events-none" />
+        {HERO_SHOES.map((shoe, idx) => (
+          <div
+            key={`bg-${shoe.name}`}
+            ref={(el) => {
+              bgRefs.current[idx] = el;
+            }}
+            style={{ opacity: idx === 0 ? 1 : 0 }}
+            className={`absolute inset-0 bg-gradient-to-br ${shoe.theme.bgGradient} pointer-events-none`}
+          />
+        ))}
 
         <div
           ref={bgScrollOverlayRef}
@@ -562,13 +573,13 @@ export default function Hero() {
             <div ref={copyRef} className="space-y-5">
               <div className="space-y-1">
                 <h1 className="text-3xl sm:text-[2.75rem] lg:text-[3.25rem] font-bold tracking-tight leading-[1.05] text-white">
-                  <span className="whitespace-nowrap">{currentShoe.tagline.split(" ")[0]} collections</span> <br />
+                  <span className="whitespace-nowrap">{copyShoe.tagline.split(" ")[0]} collections</span> <br />
                   <span className="text-white/95 font-bold">2026</span>
                 </h1>
                 <p
-                  className={`${currentShoe.theme.subtext} text-sm sm:text-[15px] leading-relaxed max-w-sm font-medium pt-0.5 transition-colors duration-500`}
+                  className={`${copyShoe.theme.subtext} text-sm sm:text-[15px] leading-relaxed max-w-sm font-medium pt-0.5 transition-colors duration-500`}
                 >
-                  {currentShoe.desc}
+                  {copyShoe.desc}
                 </p>
               </div>
 
@@ -580,7 +591,7 @@ export default function Hero() {
                   <span>Explore more</span>
                   <span
                     className="w-6 h-6 rounded-full bg-white flex items-center justify-center group-hover:translate-x-1 transition-all duration-300 shadow-sm"
-                    style={{ color: currentShoe.theme.arrowHex }}
+                    style={{ color: copyShoe.theme.arrowHex }}
                   >
                     <ArrowRight className="w-3.5 h-3.5" />
                   </span>
@@ -592,11 +603,11 @@ export default function Hero() {
                 <div className="inline-flex items-start gap-4 bg-white/10 backdrop-blur-md border border-white/10 px-4 py-3 rounded-2xl max-w-xs shadow-lg">
                   <div
                     className="w-16 h-14 rounded-xl p-1 flex items-center justify-center flex-shrink-0 shadow-md transition-all duration-500"
-                    style={{ background: currentShoe.theme.pillGradient }}
+                    style={{ background: copyShoe.theme.pillGradient }}
                   >
                     <Image
-                      src={currentShoe.image}
-                      alt={currentShoe.name}
+                      src={copyShoe.image}
+                      alt={copyShoe.name}
                       width={48}
                       height={36}
                       quality={90}
@@ -606,20 +617,20 @@ export default function Hero() {
                   </div>
                   <div className="text-left space-y-1">
                     <h4 className="text-sm font-bold text-white tracking-wide leading-none">
-                      {currentShoe.name}
+                      {copyShoe.name}
                     </h4>
                     <p
-                      className={`text-[10px] ${currentShoe.theme.subtext} leading-snug transition-colors duration-500`}
+                      className={`text-[10px] ${copyShoe.theme.subtext} leading-snug transition-colors duration-500`}
                     >
                       Play with world-class gear infused with Minion mischief...
                     </p>
                     <button
                       onClick={() =>
                         addToCart({
-                          id: `hero-${currentIndex}`,
-                          name: currentShoe.name,
-                          price: currentShoe.price,
-                          image: currentShoe.image,
+                          id: `hero-${copyIndex}`,
+                          name: copyShoe.name,
+                          price: copyShoe.price,
+                          image: copyShoe.image,
                           size: "US 10.5",
                         })
                       }
@@ -648,52 +659,33 @@ export default function Hero() {
               className="relative w-full max-w-[560px] sm:max-w-[680px] lg:max-w-[820px] aspect-[4/3] flex items-center justify-center select-none transform-gpu will-change-transform cursor-pointer"
               title="Click sneaker to view next drop"
             >
-              {/* Outgoing sneaker during transition */}
-              {outgoingIndex !== null && (
-                <div
-                  ref={outgoingShoeRef}
-                  style={{
-                    transform: `translate3d(0, ${HERO_SHOES[outgoingIndex].y}px, 0) scale(${HERO_SHOES[outgoingIndex].scale})`,
-                  }}
-                  className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none transform-gpu will-change-transform z-10"
-                >
-                  <Image
-                    src={HERO_SHOES[outgoingIndex].image}
-                    alt={HERO_SHOES[outgoingIndex].name}
-                    width={800}
-                    height={585}
-                    quality={90}
-                    priority
-                    className="w-full h-auto object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)]"
-                  />
-                </div>
-              )}
-
-              {/* Current active sneaker */}
-              <div
-                ref={currentShoeRef}
-                style={{
-                  transform: `translate3d(0, ${currentShoe.y}px, 0) scale(${currentShoe.scale})`,
-                }}
-                className="absolute inset-0 w-full h-full flex items-center justify-center transform-gpu will-change-transform z-20"
-              >
-                <div
-                  className={
-                    isTransitioning
-                      ? "w-full h-full flex items-center justify-center"
-                      : "w-full h-full flex items-center justify-center animate-hero-float"
-                  }
-                >
-                  <Image
-                    src={currentShoe.image}
-                    alt={currentShoe.name}
-                    width={800}
-                    height={585}
-                    quality={90}
-                    priority
-                    className="w-full h-auto object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)]"
-                  />
-                </div>
+              {/* Continuous floating animation wrapper (never unmounts or resets on transition) */}
+              <div className="relative w-full h-full flex items-center justify-center animate-hero-float">
+                {HERO_SHOES.map((shoe, idx) => (
+                  <div
+                    key={shoe.name}
+                    ref={(el) => {
+                      shoeRefs.current[idx] = el;
+                    }}
+                    style={{
+                      transform: `translate3d(0, ${shoe.y}px, 0) scale(${shoe.scale})`,
+                      opacity: idx === 0 ? 1 : 0,
+                      pointerEvents: idx === 0 ? "auto" : "none",
+                      zIndex: idx === 0 ? 10 : 0,
+                    }}
+                    className="absolute inset-0 w-full h-full flex items-center justify-center transform-gpu will-change-transform"
+                  >
+                    <Image
+                      src={shoe.image}
+                      alt={shoe.name}
+                      width={800}
+                      height={600}
+                      quality={90}
+                      priority={idx === 0}
+                      className="w-full h-full object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.35)]"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>

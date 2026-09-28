@@ -14,15 +14,15 @@
 
 @keyframes heroShoeFloat {
   0%, 100% {
-    transform: translateY(0px) rotate(0deg);
+    transform: translateY(0px);
   }
   50% {
-    transform: translateY(-8px) rotate(-1deg);
+    transform: translateY(-7px);
   }
 }
 
 .animate-hero-float {
-  animation: heroShoeFloat 4.5s ease-in-out infinite;
+  animation: heroShoeFloat 4.8s ease-in-out infinite;
   will-change: transform;
 }
 
