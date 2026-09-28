@@ -422,9 +422,26 @@ export default function Hero() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handlePrev, handleNext]);
 
-  // ScrollTrigger scrub animation
+  // Early scroll/touch/wheel listener: if user interacts before 3.5s entrance finishes,
+  // complete entrance immediately so ScrollTrigger and pinning activate without delay.
   useEffect(() => {
-    if (!sectionRef.current) return;
+    if (hasEntered) return;
+    const triggerEntranceComplete = () => {
+      setHasEntered(true);
+    };
+    window.addEventListener("scroll", triggerEntranceComplete, { passive: true, once: true });
+    window.addEventListener("wheel", triggerEntranceComplete, { passive: true, once: true });
+    window.addEventListener("touchmove", triggerEntranceComplete, { passive: true, once: true });
+    return () => {
+      window.removeEventListener("scroll", triggerEntranceComplete);
+      window.removeEventListener("wheel", triggerEntranceComplete);
+      window.removeEventListener("touchmove", triggerEntranceComplete);
+    };
+  }, [hasEntered]);
+
+  // ScrollTrigger scrub animation - deferred until entrance completes to prevent pin-spacer DOM reparenting from resetting CSS animations
+  useEffect(() => {
+    if (!hasEntered || !sectionRef.current) return;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) return;
 
@@ -535,11 +552,13 @@ export default function Hero() {
       );
     }
 
+    ScrollTrigger.refresh();
+
     return () => {
       scrollTl.kill();
       ScrollTrigger.getAll().forEach((st) => st.kill());
     };
-  }, []);
+  }, [hasEntered]);
 
   return (
     <section
